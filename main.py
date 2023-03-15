@@ -62,9 +62,7 @@ async def show_menu(message: types.Message, text: str = "Select an option:"):
         button_set_filter = InlineKeyboardButton(text='Set Filter', callback_data='set_filter')
         button_set_schedule = InlineKeyboardButton(text='Set Schedule', callback_data='set_schedule')
 
-        keyboard.add(button_unsub)
-        keyboard.add(button_set_filter)
-        keyboard.add(button_set_schedule)
+        keyboard.row(button_unsub, button_set_filter, button_set_schedule)
     else:
         button_sub = InlineKeyboardButton(text='Subscribe', callback_data='sub')
         keyboard.add(button_sub)
@@ -73,6 +71,7 @@ async def show_menu(message: types.Message, text: str = "Select an option:"):
     keyboard.add(button_about)
 
     await message.reply(text, reply_markup=keyboard)
+
 
 @dp.callback_query_handler(lambda c: c.data in ['sub', 'unsub', 'set_filter', 'set_schedule', 'about'])
 async def handle_callback(callback_query: types.CallbackQuery):
