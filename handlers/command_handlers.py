@@ -1,19 +1,23 @@
 from aiogram import types
-from state import subscriptions
+from database import create_connection, add_subscription, remove_subscription
 from utils.menu import show_menu
 
+
+# Modify the gdp_sub function
 async def gdp_sub(message: types.Message):
     chat_id = message.chat.id
-    subscriptions[chat_id] = True
+    conn = create_connection()
+    add_subscription(conn, chat_id)
+    conn.close()
     return "You have successfully subscribed."
 
+# Modify the gdp_unsub function
 async def gdp_unsub(message: types.Message):
     chat_id = message.chat.id
-    if chat_id in subscriptions:
-        del subscriptions[chat_id]
-        return "You have successfully unsubscribed."
-    else:
-        return "You are not currently subscribed."
+    conn = create_connection()
+    remove_subscription(conn, chat_id)
+    conn.close()
+    return "You have successfully unsubscribed."
 
 async def gdp_schedule(message: types.Message):
     # Your gdp_schedule function

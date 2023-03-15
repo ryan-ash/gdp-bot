@@ -1,8 +1,12 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
-from state import subscriptions
+from database import create_connection, get_subscriptions
 
+# Modify the show_menu function
 async def show_menu(message: Message, text: str = "Select an option:"):
     chat_id = message.chat.id
+    conn = create_connection()
+    subscriptions = get_subscriptions(conn)
+    conn.close()
     is_subscribed = chat_id in subscriptions
 
     keyboard = InlineKeyboardMarkup()
