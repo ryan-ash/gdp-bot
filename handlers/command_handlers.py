@@ -1,21 +1,31 @@
 from aiogram import types
-from database import create_connection, add_subscription, remove_subscription
+from database import create_connection, subscribe, unsubscribe, update_subscription_status, get_subscription
+
 from utils.menu import show_menu
 
 
-# Modify the gdp_sub function
 async def gdp_sub(message: types.Message):
     chat_id = message.chat.id
     conn = create_connection()
-    add_subscription(conn, chat_id)
-    conn.close()
-    return "You have successfully subscribed."
+    subscription = get_subscription(conn, chat_id)
 
-# Modify the gdp_unsub function
+    if subscription is None:
+        subscribe(conn, chat_id)
+        response = "You have been successfully subscribed!"
+    elif subscription['is_active'] == 0:
+        update_subscription_status(conn, chat_id, 1)
+        response = "You have been successfully subscribed!"
+    else:
+        response = "You are already subscribed!"
+
+    conn.close()
+    return response
+
+
 async def gdp_unsub(message: types.Message):
     chat_id = message.chat.id
     conn = create_connection()
-    remove_subscription(conn, chat_id)
+    unsubscribe(conn, chat_id)
     conn.close()
     return "You have successfully unsubscribed."
 
