@@ -73,3 +73,13 @@ def update_subscription_status(conn, chat_id, is_active):
     cursor = conn.cursor()
     cursor.execute("UPDATE subscriptions SET is_active=? WHERE chat_id=?", (is_active, chat_id))
     conn.commit()
+
+def update_subscription_filter(conn, chat_id, new_filter):
+    cursor = conn.cursor()
+    cursor.execute("UPDATE subscriptions SET filter=? WHERE chat_id=?", (new_filter, chat_id))
+    conn.commit()
+
+def update_subscription_schedule(conn, chat_id, new_schedule):
+    cursor = conn.cursor()
+    cursor.execute("UPDATE subscriptions SET schedule=? WHERE chat_id=?", (new_schedule, chat_id))
+    conn.commit()
