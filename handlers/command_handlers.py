@@ -1,11 +1,12 @@
 from aiogram.dispatcher.filters import Command, Text
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ParseMode, Message
+from croniter import croniter
+from cron_descriptor import get_description
 from database import *
-from utils.menu import show_menu
 from states import BotStates
 from typing import Optional
-from croniter import croniter
+from utils.menu import show_menu
 
 
 async def gdp_sub(message: Message, state: Optional[FSMContext] = None):
@@ -96,22 +97,22 @@ def register_command_handlers(dp):
         # Save the filter
         conn = create_connection()
         chat_id = message.chat.id
-        update_subscription_filter(conn, chat_id, message.text)
-        conn.close()
+        filter_text = message.text.strip()
 
-        # Send a success message
-        await message.reply("The filter has been updated successfully. New filter: " + message.text)
-
-        # Show the menu
-        await show_menu(message)
+        if not filter_text:
+            response = "Filter is off, all materials will be considered."
+        else:
+            response = f"The filter has been updated successfully. New filter: {filter_text}"
 
         # Finish the FSM
         await state.finish()
+        await show_menu(message, response)
 
     @dp.message_handler(Command("cancel"), state=BotStates.waiting_for_schedule)
     async def cancel_schedule_command(message: Message, state: FSMContext):
-        await message.reply("Scheduling process cancelled.")
+        response = "Scheduling process cancelled."
         await state.finish()
+        await show_menu(message, response)
 
 async def schedule_step(message: Message, state: FSMContext):
     cron_string = message.text
@@ -122,7 +123,9 @@ async def schedule_step(message: Message, state: FSMContext):
         update_subscription_schedule(conn, chat_id, cron_string)
         conn.close()
 
-        await message.reply("The schedule has been updated successfully. New schedule: " + cron_string)
+        human_readable_cron = get_description(cron_string)
+        response = f"Schedule has been set successfully. New schedule: {human_readable_cron}"
         await state.finish()
+        await show_menu(message, response)
     else:
         await message.reply("Invalid cron format. Please enter a valid cron format or type /cancel to exit.")

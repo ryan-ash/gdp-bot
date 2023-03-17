@@ -19,8 +19,12 @@ async def handle_callback(callback_query: types.CallbackQuery, state: FSMContext
     elif option == 'about':
         response = await show_about(callback_query.message)
 
-    await show_menu(callback_query.message, response)
+    if response:
+        await show_menu(callback_query.message, response)
     await callback_query.bot.answer_callback_query(callback_query.id)
 
 def register_callback_handlers(dp: Dispatcher):
-    dp.register_callback_query_handler(handle_callback, lambda c: c.data in ['sub', 'unsub', 'set_filter', 'set_schedule', 'about'])
+    dp.register_callback_query_handler(
+        lambda callback_query, state: handle_callback(callback_query, state),
+        lambda c: c.data in ['sub', 'unsub', 'set_filter', 'set_schedule', 'about']
+    )

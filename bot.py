@@ -1,6 +1,8 @@
 import os
 from aiogram import Bot, Dispatcher
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
+from aiogram.dispatcher import FSMContext
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import pytz
 
@@ -12,7 +14,8 @@ TOKEN = os.environ.get('GDP_BOT_TOKEN')
 ADMIN_CHAT_ID = os.environ.get('GDP_BOT_ADMIN_CHAT_ID')
 
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)
+storage = MemoryStorage()
+dp = Dispatcher(bot, storage=storage)
 dp.middleware.setup(LoggingMiddleware())
 
 register_command_handlers(dp)
