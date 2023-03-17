@@ -1,10 +1,10 @@
 from aiogram import types
-from aiogram.dispatcher import Dispatcher
+from aiogram.dispatcher import Dispatcher, FSMContext
 
-from handlers.command_handlers import gdp_sub, gdp_unsub, handle_gdp_filter, handle_gdp_schedule, show_about
+from handlers.command_handlers import gdp_sub, gdp_unsub, gdp_filter, gdp_schedule, show_about
 from utils.menu import show_menu
 
-async def handle_callback(callback_query: types.CallbackQuery):
+async def handle_callback(callback_query: types.CallbackQuery, state: FSMContext):
     option = callback_query.data
     chat_id = callback_query.message.chat.id
 
@@ -13,9 +13,9 @@ async def handle_callback(callback_query: types.CallbackQuery):
     elif option == 'unsub':
         response = await gdp_unsub(callback_query.message)
     elif option == 'set_filter':
-        response = await handle_gdp_filter(callback_query.message)
+        response = await gdp_filter(callback_query.message, state)
     elif option == 'set_schedule':
-        response = await handle_gdp_schedule(callback_query.message)
+        response = await gdp_schedule(callback_query.message, state)
     elif option == 'about':
         response = await show_about(callback_query.message)
 

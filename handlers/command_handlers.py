@@ -4,11 +4,11 @@ from aiogram.types import ParseMode, Message
 from database import *
 from utils.menu import show_menu
 from states import BotStates
+from typing import Optional
 from croniter import croniter
 
 
-
-async def gdp_sub(message: Message):
+async def gdp_sub(message: Message, state: Optional[FSMContext] = None):
     chat_id = message.chat.id
     conn = create_connection()
     subscription = get_subscription(conn, chat_id)
@@ -26,20 +26,26 @@ async def gdp_sub(message: Message):
     return response
 
 
-async def gdp_unsub(message: Message):
+async def gdp_unsub(message: Message, state: Optional[FSMContext] = None):
     chat_id = message.chat.id
     conn = create_connection()
     unsubscribe(conn, chat_id)
     conn.close()
     return "You have successfully unsubscribed."
 
-async def gdp_schedule(message: Message):
-    # Your gdp_schedule function
-    pass
 
-async def gdp_filter(message: Message):
-    # Your gdp_filter function
-    pass
+async def gdp_schedule(message: Message, state: Optional[FSMContext] = None):
+    await message.reply(
+        "Please enter the scheduling rules in cron format. For help, use this link: [Crontab Guru](https://crontab.guru/)",
+        parse_mode=ParseMode.MARKDOWN,
+    )
+    await BotStates.waiting_for_schedule.set()
+
+
+async def gdp_filter(message: Message, state: Optional[FSMContext] = None):
+    await message.reply("Please enter the filter:")
+    await BotStates.waiting_for_filter.set()
+
 
 async def show_about(message: Message):
     about_text = """
@@ -53,6 +59,7 @@ Commands:
 - /gdp_about: Show About information
 """
     return about_text
+
 
 def register_command_handlers(dp):
     @dp.message_handler(commands=['start', 'gdp_about'])
@@ -74,11 +81,7 @@ def register_command_handlers(dp):
 
     @dp.message_handler(Command("gdp_schedule"), state="*")
     async def gdp_schedule_command(message: Message, state: FSMContext):
-        await message.reply(
-            "Please enter the scheduling rules in cron format. For help, use this link: [Crontab Guru](https://crontab.guru/)",
-            parse_mode=ParseMode.MARKDOWN,
-        )
-        await BotStates.waiting_for_schedule.set()
+        await gdp_schedule(message, state)
 
     @dp.message_handler(lambda message: not message.text.startswith("/"), state=BotStates.waiting_for_schedule)
     async def process_schedule(message: Message, state: FSMContext):
@@ -86,8 +89,7 @@ def register_command_handlers(dp):
 
     @dp.message_handler(Command("gdp_filter"), state="*")
     async def gdp_filter_command(message: Message, state: FSMContext):
-        await message.reply("Please enter the filter:")
-        await BotStates.waiting_for_filter.set()
+        await gdp_filter(message, state)
 
     @dp.message_handler(lambda message: not message.text.startswith("/"), state=BotStates.waiting_for_filter)
     async def process_filter(message: Message, state: FSMContext):
@@ -110,15 +112,6 @@ def register_command_handlers(dp):
     async def cancel_schedule_command(message: Message, state: FSMContext):
         await message.reply("Scheduling process cancelled.")
         await state.finish()
-
-
-async def handle_gdp_filter(message: Message):
-    # Add your filter handling logic here
-    return "Filter handling logic goes here."
-
-async def handle_gdp_schedule(message: Message):
-    # Add your schedule handling logic here
-    return "Schedule handling logic goes here."
 
 async def schedule_step(message: Message, state: FSMContext):
     cron_string = message.text

@@ -1,7 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from database import create_connection, get_active_subscription
 
-
 async def show_menu(message: Message, text: str = "Select an option:"):
     chat_id = message.chat.id
     conn = create_connection()
@@ -25,4 +24,3 @@ async def show_menu(message: Message, text: str = "Select an option:"):
     keyboard.add(button_about)
 
     await message.reply(text, reply_markup=keyboard)
-
