@@ -125,8 +125,11 @@ def get_all_posts(conn):
 
 def get_filtered_posts(conn, filter_list):
     cur = conn.cursor()
-    query = "SELECT * FROM posts WHERE "
-    query += " OR ".join([f"content LIKE '%{filter_}%' " for filter_ in filter_list])
+    if filter_list:
+        query = "SELECT * FROM posts WHERE "
+        query += " OR ".join([f"content LIKE '%{filter_}%' " for filter_ in filter_list])
+    else:
+        query = "SELECT * FROM posts"
     cur.execute(query)
     rows = cur.fetchall()
     return rows

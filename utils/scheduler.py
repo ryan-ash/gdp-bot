@@ -4,12 +4,18 @@ from croniter import croniter
 from datetime import datetime
 import random
 
+
 def is_time_to_send(schedule):
     now = datetime.now()
     cron = croniter(schedule, now)
     prev_time = cron.get_prev(datetime)
     next_time = cron.get_next(datetime)
-    return prev_time < now < next_time
+
+    # Set a fixed tolerance value
+    tolerance = 30
+
+    return abs((now - prev_time).total_seconds() - (next_time - prev_time).total_seconds()) <= tolerance
+
 
 async def send_post_to_chat(bot, chat_id, post_id):
     post_link = f"{CHANNEL_LINK}/{post_id}"
