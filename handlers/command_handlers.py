@@ -9,18 +9,20 @@ from typing import Optional
 from utils.menu import show_menu
 
 
-async def get_subscription_info(chat_id: int):
+async def get_subscription_info(chat_id):
     conn = create_connection()
     subscription = get_subscription(conn, chat_id)
-    conn.close()
 
-    if subscription and subscription['is_active'] != 0:
+    if not subscription or not subscription["is_active"]:
+        return None
+
+    filter_data = subscription['filter']
+    if subscription['schedule']:
         schedule = ExpressionDescriptor(subscription['schedule']).get_description()
-        filter_text = subscription['filter'] or "No filter"
-        subscription_info = f"You are currently subscribed to receive updates from the @GameDevPorn channel.\nSchedule: {schedule}\nFilter: {filter_text}"
-        return subscription_info
     else:
-        return ""
+        schedule = "Not set"
+
+    return f"You are currently subscribed with the following preferences:\n\nFilter: {filter_data}\nSchedule: {schedule}"
 
 
 async def gdp_sub(message: Message, state: Optional[FSMContext] = None):

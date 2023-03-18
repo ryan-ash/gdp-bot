@@ -1,5 +1,6 @@
-# Projects
+# IDE & Cache
 *.db
+*.session
 *.code-workspace
 .vscode/*
 

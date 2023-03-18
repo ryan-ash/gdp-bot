@@ -2,16 +2,15 @@ import sqlite3
 from sqlite3 import Error
 
 def create_connection():
-    conn = None
+    conn = None;
     try:
         conn = sqlite3.connect('subscriptions.db')
-        create_table(conn)  # Add this line
+        create_tables(conn)
     except Error as e:
         print(e)
     return conn
 
-
-def create_table(conn):
+def create_tables(conn):
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS subscriptions (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,6 +19,16 @@ def create_table(conn):
                         filter TEXT,
                         schedule TEXT
                       )''')
+
+    cursor.execute('''CREATE TABLE IF NOT EXISTS posts (
+                        id INTEGER PRIMARY KEY,
+                        content TEXT NOT NULL
+                     )''')
+
+    cursor.execute('''CREATE TABLE IF NOT EXISTS meta (
+                        key TEXT PRIMARY KEY,
+                        value TEXT
+                     )''')
 
 
 def subscribe(conn, chat_id):
@@ -83,3 +92,38 @@ def update_subscription_schedule(conn, chat_id, new_schedule):
     cursor = conn.cursor()
     cursor.execute("UPDATE subscriptions SET schedule=? WHERE chat_id=?", (new_schedule, chat_id))
     conn.commit()
+
+def add_post(conn, post_id, content):
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR IGNORE INTO posts (id, content) VALUES (?, ?)", (post_id, content))
+    conn.commit()
+
+def get_last_post_handled(conn):
+    cursor = conn.cursor()
+    cursor.execute("SELECT value FROM meta WHERE key='last_post_handled'")
+    result = cursor.fetchone()
+    return int(result[0]) if result else None
+
+def update_last_post_handled(conn, post_id):
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR REPLACE INTO meta (key, value) VALUES ('last_post_handled', ?)", (str(post_id),))
+    conn.commit()
+
+def get_all_posts(conn):
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM posts")
+    rows = cursor.fetchall()
+
+    posts = []
+    for row in rows:
+        post = {
+            "id": row[0],
+            "content": row[1]
+        }
+        posts.append(post)
+    return posts
+
+def count_posts(conn):
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM posts")
+    return cursor.fetchone()[0]
