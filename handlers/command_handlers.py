@@ -2,11 +2,25 @@ from aiogram.dispatcher.filters import Command, Text
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ParseMode, Message
 from croniter import croniter
-from cron_descriptor import get_description
+from cron_descriptor import get_description, ExpressionDescriptor
 from database import *
 from states import BotStates
 from typing import Optional
 from utils.menu import show_menu
+
+
+async def get_subscription_info(chat_id: int):
+    conn = create_connection()
+    subscription = get_subscription(conn, chat_id)
+    conn.close()
+
+    if subscription and subscription['is_active'] != 0:
+        schedule = ExpressionDescriptor(subscription['schedule']).get_description()
+        filter_text = subscription['filter'] or "No filter"
+        subscription_info = f"You are currently subscribed to receive updates from the @GameDevPorn channel.\nSchedule: {schedule}\nFilter: {filter_text}"
+        return subscription_info
+    else:
+        return ""
 
 
 async def gdp_sub(message: Message, state: Optional[FSMContext] = None):
@@ -49,16 +63,26 @@ async def gdp_filter(message: Message, state: Optional[FSMContext] = None):
 
 
 async def show_about(message: Message):
-    about_text = """
-This bot allows you to subscribe to receive updates from the @GameDevPorn channel according to your preferences.
-By subscribing, you can set a schedule and filters to receive a random post that matches your filters.
-Commands:
-- /gdp_sub: Subscribe
-- /gdp_unsub: Unsubscribe
-- /gdp_schedule: Set schedule
-- /gdp_filter: Set filters
-- /gdp_about: Show About information
-"""
+    chat_id = message.chat.id
+    subscription_info = await get_subscription_info(chat_id)
+
+    about_text = (
+        "This bot allows you to subscribe to receive updates from the @GameDevPorn channel according to your preferences.\n"
+        "By subscribing, you can set a schedule and filters to receive a random post that matches your filters."
+    )
+    
+    if subscription_info:
+        about_text += f"\n\n{subscription_info}"
+
+    about_text += (
+        "\n\nCommands:"
+        "\n- /gdp_sub: Subscribe"
+        "\n- /gdp_unsub: Unsubscribe"
+        "\n- /gdp_schedule: Set schedule"
+        "\n- /gdp_filter: Set filters"
+        "\n- /gdp_about: Show About information"
+    )
+    
     return about_text
 
 
@@ -94,7 +118,6 @@ def register_command_handlers(dp):
 
     @dp.message_handler(lambda message: not message.text.startswith("/"), state=BotStates.waiting_for_filter)
     async def process_filter(message: Message, state: FSMContext):
-        # Save the filter
         conn = create_connection()
         chat_id = message.chat.id
         filter_text = message.text.strip()
@@ -102,9 +125,12 @@ def register_command_handlers(dp):
         if not filter_text:
             response = "Filter is off, all materials will be considered."
         else:
-            response = f"The filter has been updated successfully. New filter: {filter_text}"
+            response = f"The filter has been updated successfully"
+    
+        update_subscription_filter(conn, chat_id, filter_text)
+        subscription_info = await get_subscription_info(chat_id)
+        response = f"{response}\n\n{subscription_info}"
 
-        # Finish the FSM
         await state.finish()
         await show_menu(message, response)
 
@@ -123,8 +149,10 @@ async def schedule_step(message: Message, state: FSMContext):
         update_subscription_schedule(conn, chat_id, cron_string)
         conn.close()
 
-        human_readable_cron = get_description(cron_string)
-        response = f"Schedule has been set successfully. New schedule: {human_readable_cron}"
+        response = f"Schedule has been set successfully"
+        subscription_info = await get_subscription_info(chat_id)
+        response = f"{response}\n\n{subscription_info}"
+
         await state.finish()
         await show_menu(message, response)
     else:
