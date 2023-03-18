@@ -30,37 +30,37 @@ def create_tables(conn):
                         value TEXT
                      )''')
 
-
 def subscribe(conn, chat_id):
     cursor = conn.cursor()
     cursor.execute('''INSERT OR IGNORE INTO subscriptions (chat_id, is_active) VALUES (?, 1)
                       ON CONFLICT(chat_id) DO UPDATE SET is_active=1''', (chat_id,))
     conn.commit()
 
-
 def unsubscribe(conn, chat_id):
     cursor = conn.cursor()
     cursor.execute('''UPDATE subscriptions SET is_active=0 WHERE chat_id=?''', (chat_id,))
     conn.commit()
-
 
 def update_filter(conn, chat_id, filter_tags):
     cursor = conn.cursor()
     cursor.execute('''UPDATE subscriptions SET filter=? WHERE chat_id=?''', (filter_tags, chat_id))
     conn.commit()
 
-
 def update_schedule(conn, chat_id, schedule):
     cursor = conn.cursor()
     cursor.execute('''UPDATE subscriptions SET schedule=? WHERE chat_id=?''', (schedule, chat_id))
     conn.commit()
 
+def get_subscriptions(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM subscriptions WHERE is_active = 1 AND schedule IS NOT NULL")
+    rows = cur.fetchall()
+    return rows
 
 def get_active_subscription(conn, chat_id):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM subscriptions WHERE chat_id=? AND is_active=1", (chat_id,))
     return cursor.fetchone()
-
 
 def get_subscription(conn, chat_id):
     cursor = conn.cursor()
@@ -122,6 +122,14 @@ def get_all_posts(conn):
         }
         posts.append(post)
     return posts
+
+def get_filtered_posts(conn, filter_list):
+    cur = conn.cursor()
+    query = "SELECT * FROM posts WHERE "
+    query += " OR ".join([f"content LIKE '%{filter_}%' " for filter_ in filter_list])
+    cur.execute(query)
+    rows = cur.fetchall()
+    return rows
 
 def count_posts(conn):
     cursor = conn.cursor()
