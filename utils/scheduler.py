@@ -1,20 +1,22 @@
 from config import ADMIN_CHAT_ID, CHANNEL_LINK
 from database import create_connection, get_subscriptions, get_filtered_posts
 from croniter import croniter
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 
 
 def is_time_to_send(schedule):
     now = datetime.now()
-    cron = croniter(schedule, now)
+    ref_time = now - timedelta(seconds=30)
+    
+    cron = croniter(schedule, ref_time)
     prev_time = cron.get_prev(datetime)
     next_time = cron.get_next(datetime)
 
-    # Set a fixed tolerance value
+    delta = next_time - prev_time
     tolerance = 30
 
-    return abs((now - prev_time).total_seconds() - (next_time - prev_time).total_seconds()) <= tolerance
+    return abs((ref_time - prev_time).total_seconds() - delta.total_seconds()) <= tolerance
 
 
 async def send_post_to_chat(bot, chat_id, post_id):
