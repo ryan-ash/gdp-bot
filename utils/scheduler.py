@@ -23,6 +23,7 @@ async def send_post_to_chat(bot, chat_id, post_id):
     post_link = f"{CHANNEL_LINK}/{post_id}"
     await bot.send_message(chat_id, post_link)
 
+
 async def schedule_trigger(bot):
     conn = create_connection()
     subscriptions = get_subscriptions(conn)
@@ -33,12 +34,13 @@ async def schedule_trigger(bot):
         filters = subscription[3]
 
         if is_time_to_send(schedule):
-            filter_list = filters.split('|')
+            filter_list = [] if filters is None else filters.split('|')
             posts = get_filtered_posts(conn, filter_list)
 
             if posts:
                 random_post = random.choice(posts)
                 await send_post_to_chat(bot, chat_id, random_post[0])
+
 
 async def on_startup(bot, dp):
     if ADMIN_CHAT_ID:
