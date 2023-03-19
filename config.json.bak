@@ -1,0 +1,8 @@
+{
+    "GDP_BOT_TOKEN": "your_bot_token",
+    "GDP_BOT_ADMIN_CHAT_ID": "your_admin_chat_id",
+    "GDP_BOT_API_ID": "your_api_id",
+    "GDP_BOT_API_HASH": "your_api_hash",
+    "GDP_BOT_CHANNEL_LINK": "your_channel_link",
+    "GDP_BOT_PHONE": "your_phone_number"
+}

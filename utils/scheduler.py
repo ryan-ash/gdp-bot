@@ -30,14 +30,14 @@ async def send_post_to_chat(bot, chat_id, post):
     inline_button = InlineKeyboardButton("src", url=post_link)
     inline_kb = InlineKeyboardMarkup().add(inline_button)
 
-    # Escape < and > symbols
-    post_text = post_text.replace('<', '&lt;').replace('>', '&gt;')
+    def escape_html_tags(match):
+        return match.group(0).replace('<', '&lt;').replace('>', '&gt;')
 
+    post_text = re.sub(r'<[^>]+>', escape_html_tags, post_text)
     post_text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', post_text)
-    post_text = re.sub(r'\[([^\[]+?)\]\((.+?)\)', r'<a href="\2">\1</a>', post_text)
-
-    # Replace triple backticks with <code> tags
-    post_text = re.sub(r'```(.+?)```', r'<code>\1</code>', post_text, flags=re.DOTALL)
+    post_text = re.sub(r'\[([^\]]+?)\]\(([^)]+?)\)', r'<a href="\2">\1</a>', post_text)
+    post_text = re.sub(r'```([\s\S]+?)```', r'<code>\1</code>', post_text)
+    post_text = re.sub(r'`([\s\S]+?)`', r'<pre>\1</pre>', post_text)
 
     await bot.send_message(chat_id, post_text, reply_markup=inline_kb, parse_mode='HTML')
 

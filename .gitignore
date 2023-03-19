@@ -1,6 +1,9 @@
-# IDE & Cache
+# Project
 *.db
 *.session
+config.json
+
+# IDE
 *.code-workspace
 .vscode/*
 
