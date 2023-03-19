@@ -138,3 +138,9 @@ def count_posts(conn):
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM posts")
     return cursor.fetchone()[0]
+
+def search_post_with_string(conn, search_string):
+    query = "SELECT * FROM posts WHERE content LIKE ?"
+    cursor = conn.cursor()
+    cursor.execute(query, (f"%{search_string}%",))
+    return cursor.fetchone()

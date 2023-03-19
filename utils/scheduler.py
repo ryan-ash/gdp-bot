@@ -5,6 +5,7 @@ from database import create_connection, get_subscriptions, get_filtered_posts
 from croniter import croniter
 from datetime import datetime, timedelta
 import random
+import re
 
 
 def is_time_to_send(schedule):
@@ -29,7 +30,16 @@ async def send_post_to_chat(bot, chat_id, post):
     inline_button = InlineKeyboardButton("src", url=post_link)
     inline_kb = InlineKeyboardMarkup().add(inline_button)
 
-    await bot.send_message(chat_id, post_text, reply_markup=inline_kb, parse_mode='Markdown')
+    # Escape < and > symbols
+    post_text = post_text.replace('<', '&lt;').replace('>', '&gt;')
+
+    post_text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', post_text)
+    post_text = re.sub(r'\[([^\[]+?)\]\((.+?)\)', r'<a href="\2">\1</a>', post_text)
+
+    # Replace triple backticks with <code> tags
+    post_text = re.sub(r'```(.+?)```', r'<code>\1</code>', post_text, flags=re.DOTALL)
+
+    await bot.send_message(chat_id, post_text, reply_markup=inline_kb, parse_mode='HTML')
 
 
 async def schedule_trigger(bot):
