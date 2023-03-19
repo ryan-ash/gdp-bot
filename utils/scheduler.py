@@ -14,7 +14,7 @@ def is_time_to_send(schedule):
     next_time = cron.get_next(datetime)
 
     delta = next_time - prev_time
-    tolerance = 30
+    tolerance = 60
 
     return abs((ref_time - prev_time).total_seconds() - delta.total_seconds()) <= tolerance
 
