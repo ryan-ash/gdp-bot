@@ -1,3 +1,5 @@
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.markdown import quote_html
 from config import ADMIN_CHAT_ID, CHANNEL_LINK
 from database import create_connection, get_subscriptions, get_filtered_posts
 from croniter import croniter
@@ -19,9 +21,15 @@ def is_time_to_send(schedule):
     return abs((ref_time - prev_time).total_seconds() - delta.total_seconds()) <= tolerance
 
 
-async def send_post_to_chat(bot, chat_id, post_id):
+async def send_post_to_chat(bot, chat_id, post):
+    post_id = post[0]
+    post_text = post[1]
     post_link = f"{CHANNEL_LINK}/{post_id}"
-    await bot.send_message(chat_id, post_link)
+
+    inline_button = InlineKeyboardButton("src", url=post_link)
+    inline_kb = InlineKeyboardMarkup().add(inline_button)
+
+    await bot.send_message(chat_id, post_text, reply_markup=inline_kb, parse_mode='Markdown')
 
 
 async def schedule_trigger(bot):
@@ -39,7 +47,7 @@ async def schedule_trigger(bot):
 
             if posts:
                 random_post = random.choice(posts)
-                await send_post_to_chat(bot, chat_id, random_post[0])
+                await send_post_to_chat(bot, chat_id, random_post)
 
 
 async def on_startup(bot, dp):
