@@ -164,7 +164,7 @@ def register_command_handlers(dp):
 
     @dp.message_handler(Command("cancel"), state=[BotStates.waiting_for_schedule, BotStates.waiting_for_filter])
     async def cancel_command(message: Message, state: FSMContext):
-        response = "You changed your mind and settings stay the same."
+        response = "You've changed your mind, and the settings will remain the same."
         subscription_info = await get_subscription_info(message.chat.id)
         response = f"{response}\n\n{subscription_info}"
         await state.finish()
