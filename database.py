@@ -1,4 +1,5 @@
 import sqlite3
+from config import IGNORED_POSTS
 from sqlite3 import Error
 
 def create_connection():
@@ -125,11 +126,13 @@ def get_all_posts(conn):
 
 def get_filtered_posts(conn, filter_list):
     cur = conn.cursor()
+    query = "SELECT * FROM posts WHERE id NOT IN ({}) AND TRIM(content) <> ''".format(",".join(map(str, IGNORED_POSTS)))
+    
     if filter_list:
-        query = "SELECT * FROM posts WHERE "
+        query += " AND ("
         query += " OR ".join([f"content LIKE '%{filter_}%' " for filter_ in filter_list])
-    else:
-        query = "SELECT * FROM posts"
+        query += ")"
+    
     cur.execute(query)
     rows = cur.fetchall()
     return rows

@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.markdown import quote_html
-from config import ADMIN_CHAT_ID, CHANNEL_LINK
+from config import ADMIN_CHAT_ID, CHANNEL_LINK, MENU
 from database import create_connection, get_subscriptions, get_filtered_posts
 from croniter import croniter
 from datetime import datetime, timedelta
@@ -27,8 +27,18 @@ async def send_post_to_chat(bot, chat_id, post):
     post_text = post[1]
     post_link = f"{CHANNEL_LINK}/{post_id}"
 
-    inline_button = InlineKeyboardButton("src", url=post_link)
+    inline_button = InlineKeyboardButton("🔗 Source 🔗", url=post_link)
     inline_kb = InlineKeyboardMarkup().add(inline_button)
+
+    # Create menu buttons
+    menu_rows = MENU.split("||")
+    for row in menu_rows:
+        buttons = row.split("|")
+        button_row = []
+        for button in buttons:
+            text, url = re.search(r"(.+?)\s*-\s*(.+)", button.strip()).groups()
+            button_row.append(InlineKeyboardButton(text.strip(), url=url.strip()))
+        inline_kb.row(*button_row)
 
     def escape_html_tags(match):
         return match.group(0).replace('<', '&lt;').replace('>', '&gt;')

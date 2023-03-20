@@ -1,8 +1,10 @@
 {
-    "GDP_BOT_TOKEN": "your_bot_token",
-    "GDP_BOT_ADMIN_CHAT_ID": "your_admin_chat_id",
-    "GDP_BOT_API_ID": "your_api_id",
-    "GDP_BOT_API_HASH": "your_api_hash",
-    "GDP_BOT_CHANNEL_LINK": "your_channel_link",
-    "GDP_BOT_PHONE": "your_phone_number"
+    "TOKEN": "your_token",
+    "ADMIN_CHAT_ID": "your_admin_chat_id",
+    "API_ID": "your_api_id",
+    "API_HASH": "your_api_hash",
+    "CHANNEL_LINK": "your_channel_link",
+    "PHONE": "your_phone_number",
+    "IGNORED_POSTS": [1, 2, 3],
+    "MENU": "Menu Item 1 - link | Menu Item 2 - link || Row 2 Menu Item 1 - link"
 }
