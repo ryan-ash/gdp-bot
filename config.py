@@ -3,6 +3,7 @@ import codecs
 
 with codecs.open('config.json', 'r', encoding='utf-8') as f:
     config_data = json.load(f)
+    print(config_data)
 
 try:
     TOKEN = config_data['TOKEN']
