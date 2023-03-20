@@ -10,15 +10,16 @@ async def show_menu(message: Message, text: str = "Select an option:"):
 
     keyboard = InlineKeyboardMarkup()
 
+    button_set_filter = InlineKeyboardButton(text='Set Filter', callback_data='set_filter')
+    button_fetch = InlineKeyboardButton(text='Fetch', callback_data='fetch')
+
     if is_subscribed:
         button_unsub = InlineKeyboardButton(text='Unsubscribe', callback_data='unsub')
-        button_set_filter = InlineKeyboardButton(text='Set Filter', callback_data='set_filter')
         button_set_schedule = InlineKeyboardButton(text='Set Schedule', callback_data='set_schedule')
-
-        keyboard.row(button_unsub, button_set_filter, button_set_schedule)
+        keyboard.row(button_unsub, button_set_filter, button_set_schedule, button_fetch)
     else:
         button_sub = InlineKeyboardButton(text='Subscribe', callback_data='sub')
-        keyboard.add(button_sub)
+        keyboard.row(button_sub, button_set_filter, button_fetch)
 
     button_about = InlineKeyboardButton(text='About', callback_data='about')
     keyboard.add(button_about)
