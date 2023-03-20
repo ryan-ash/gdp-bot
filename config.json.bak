@@ -4,7 +4,9 @@
     "API_ID": "your_api_id",
     "API_HASH": "your_api_hash",
     "CHANNEL_LINK": "your_channel_link",
+    "CHANNEL_USERNAME": "@ChannelName",
     "PHONE": "your_phone_number",
     "IGNORED_POSTS": [1, 2, 3],
-    "MENU": "Menu Item 1 - link | Menu Item 2 - link || Row 2 Menu Item 1 - link"
+    "MENU": "Menu Item 1 - link | Menu Item 2 - link || Row 2 Menu Item 1 - link",
+    "RECOMMENDED_FILTERS": "Any|Recommended Filters|You Like"
 }

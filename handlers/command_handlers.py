@@ -1,6 +1,7 @@
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ParseMode, Message
+from config import CHANNEL_USERNAME, RECOMMENDED_FILTERS
 from croniter import croniter
 from cron_descriptor import ExpressionDescriptor
 from database import *
@@ -65,7 +66,14 @@ async def gdp_schedule(message: Message, state: Optional[FSMContext] = None):
 
 
 async def gdp_filter(message: Message, state: Optional[FSMContext] = None):
-    await message.reply("Please enter the filter (use | to separate multiple filters, * for no filter):\n\nType /cancel to exit.")
+    chat_id = message.chat.id
+    conn = create_connection()
+    subscription = get_subscription(conn, chat_id)
+    current_filter = subscription['filter'] if subscription and subscription['filter'] else '-'
+
+    prompt = f"Enter the filter using | to separate multiple filters, or * for no filter. Type /cancel to exit.\n\nRecommended: <code>{RECOMMENDED_FILTERS}</code>\nCurrent: <code>{current_filter}</code>"
+
+    await message.reply(prompt, parse_mode='HTML')
     await BotStates.waiting_for_filter.set()
 
 
@@ -74,8 +82,8 @@ async def show_about(message: Message):
     subscription_info = await get_subscription_info(chat_id)
 
     about_text = (
-        "This bot allows you to subscribe to receive updates from the @GameDevPorn channel according to your preferences.\n"
-        "By subscribing, you can set a schedule and filters to receive a random post that matches your filters."
+        f"Hey there! This rad bot hooks you up with updates from the {CHANNEL_USERNAME} channel, tailored just for you! "
+        "Subscribe and customize your schedule and filters, so you'll only get the coolest, most wicked posts that suit your taste. Rock on!"
     )
     
     if subscription_info:
