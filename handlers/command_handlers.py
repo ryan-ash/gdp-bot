@@ -107,7 +107,7 @@ async def show_about(message: Message):
     subscription_info = await get_subscription_info(chat_id)
 
     about_cover_url = get_random_about_cover_url()
-    invisible_link = f'<a href="{about_cover_url}">&nbsp;</a>'
+    invisible_link = f'<a href="{about_cover_url}">&#8203;</a>'
 
     about_text = (
         invisible_link +

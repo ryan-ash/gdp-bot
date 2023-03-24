@@ -24,4 +24,5 @@ async def show_menu(message: Message, text: str = "Select an option:"):
     button_about = InlineKeyboardButton(text='About', callback_data='about')
     keyboard.add(button_about)
 
-    await message.reply(text, reply_markup=keyboard)
+    await message.reply(text, reply_markup=keyboard, parse_mode='HTML')
+
