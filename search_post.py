@@ -1,12 +1,12 @@
 import sys
-from database import create_connection, search_post_with_string
+from database import create_connection, search_post_with_string, POSTS_DB
 
 if len(sys.argv) < 2:
     print("Usage: python search_post.py <search_string>")
     sys.exit(1)
 
 search_string = sys.argv[1]
-conn = create_connection()
+conn = create_connection(POSTS_DB)
 post = search_post_with_string(conn, search_string)
 
 if post:

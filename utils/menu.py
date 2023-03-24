@@ -1,9 +1,9 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
-from database import create_connection, get_active_subscription
+from database import create_connection, get_active_subscription, SUBSCRIPTIONS_DB
 
 async def show_menu(message: Message, text: str = "Select an option:"):
     chat_id = message.chat.id
-    conn = create_connection()
+    conn = create_connection(SUBSCRIPTIONS_DB)
     subscription = get_active_subscription(conn, chat_id)
     conn.close()
     is_subscribed = subscription is not None

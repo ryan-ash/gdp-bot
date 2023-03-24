@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.markdown import quote_html
 from config import ADMIN_CHAT_ID, CHANNEL_LINK, MENU
-from database import create_connection, get_subscriptions, get_filtered_posts
+from database import create_connection, get_subscriptions, get_filtered_posts, SUBSCRIPTIONS_DB, POSTS_DB
 from croniter import croniter
 from datetime import datetime, timedelta
 import random
@@ -10,14 +10,14 @@ import re
 
 def is_time_to_send(schedule):
     now = datetime.now()
-    ref_time = now - timedelta(seconds=30)
+    tolerance = 60
+    ref_time = now - timedelta(seconds=tolerance)
     
     cron = croniter(schedule, ref_time)
     prev_time = cron.get_prev(datetime)
     next_time = cron.get_next(datetime)
 
     delta = next_time - prev_time
-    tolerance = 60
 
     return abs((ref_time - prev_time).total_seconds() - delta.total_seconds()) <= tolerance
 
@@ -53,7 +53,7 @@ async def send_post_to_chat(bot, chat_id, post):
 
 
 async def fetch_and_send_post(bot, chat_id, filters):
-    conn = create_connection()
+    conn = create_connection(POSTS_DB)
     filter_list = [] if filters is None else filters.split('|')
     posts = get_filtered_posts(conn, filter_list)
 
@@ -66,7 +66,7 @@ async def fetch_and_send_post(bot, chat_id, filters):
 
 
 async def schedule_trigger(bot):
-    conn = create_connection()
+    conn = create_connection(SUBSCRIPTIONS_DB)
     subscriptions = get_subscriptions(conn)
 
     for subscription in subscriptions:

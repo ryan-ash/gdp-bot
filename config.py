@@ -15,5 +15,10 @@ try:
     IGNORED_POSTS = config_data['IGNORED_POSTS']
     MENU = config_data['MENU']
     RECOMMENDED_FILTERS = config_data['RECOMMENDED_FILTERS']
+    SFTP_HOST = config_data['SFTP_HOST']
+    SFTP_PORT = config_data['SFTP_PORT']
+    SFTP_USER = config_data['SFTP_USER']
+    SFTP_PASSWORD = config_data['SFTP_PASSWORD']
+    SFTP_REMOTE_PATH = config_data['SFTP_REMOTE_PATH']
 except KeyError as e:
     raise KeyError(f"Missing required key in config.json: {e}")

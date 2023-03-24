@@ -13,7 +13,7 @@ import time
 
 
 async def get_subscription_info(chat_id):
-    conn = create_connection()
+    conn = create_connection(SUBSCRIPTIONS_DB)
     subscription = get_subscription(conn, chat_id)
 
     if not subscription or not subscription["is_active"]:
@@ -31,7 +31,7 @@ async def get_subscription_info(chat_id):
 
 async def gdp_sub(message: Message, state: Optional[FSMContext] = None):
     chat_id = message.chat.id
-    conn = create_connection()
+    conn = create_connection(SUBSCRIPTIONS_DB)
     subscription = get_subscription(conn, chat_id)
 
     if subscription is None:
@@ -52,7 +52,7 @@ async def gdp_sub(message: Message, state: Optional[FSMContext] = None):
 
 async def gdp_unsub(message: Message, state: Optional[FSMContext] = None):
     chat_id = message.chat.id
-    conn = create_connection()
+    conn = create_connection(SUBSCRIPTIONS_DB)
     unsubscribe(conn, chat_id)
     conn.close()
     return "You have successfully unsubscribed."
@@ -79,7 +79,7 @@ async def gdp_schedule(message: Message, state: Optional[FSMContext] = None):
 
 async def gdp_filter(message: Message, state: Optional[FSMContext] = None):
     chat_id = message.chat.id
-    conn = create_connection()
+    conn = create_connection(SUBSCRIPTIONS_DB)
     subscription = get_subscription(conn, chat_id)
     current_filter = subscription['filter'] if subscription and subscription['filter'] else '-'
 
@@ -156,7 +156,7 @@ def register_command_handlers(dp):
 
     @dp.message_handler(lambda message: not message.text.startswith("/"), state=BotStates.waiting_for_filter)
     async def process_filter(message: Message, state: FSMContext):
-        conn = create_connection()
+        conn = create_connection(SUBSCRIPTIONS_DB)
         chat_id = message.chat.id
         filter_text = message.text.strip()
 
@@ -196,7 +196,7 @@ async def schedule_step(message: Message, state: FSMContext):
     cron_string = message.text
 
     if croniter.is_valid(cron_string):
-        conn = create_connection()
+        conn = create_connection(SUBSCRIPTIONS_DB)
         chat_id = message.chat.id
         update_subscription_schedule(conn, chat_id, cron_string)
         conn.close()
@@ -215,7 +215,7 @@ async def schedule_step(message: Message, state: FSMContext):
 async def send_filtered_post(message: Message, state: FSMContext):
     bot = message.bot
     chat_id = message.chat.id
-    conn = create_connection()
+    conn = create_connection(SUBSCRIPTIONS_DB)
     subscription = get_subscription(conn, chat_id)
 
     if subscription is None:

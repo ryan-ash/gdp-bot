@@ -8,5 +8,10 @@
     "PHONE": "your_phone_number",
     "IGNORED_POSTS": [1, 2, 3],
     "MENU": "Menu Item 1 - link | Menu Item 2 - link || Row 2 Menu Item 1 - link",
-    "RECOMMENDED_FILTERS": "Any|Recommended Filters|You Like"
+    "RECOMMENDED_FILTERS": "Any|Recommended Filters|You Like",
+    "SFTP_HOST": "your_remote_server",
+    "SFTP_PORT": 22,
+    "SFTP_USER": "your_username",
+    "SFTP_PASSWORD": "your_password",
+    "SFTP_REMOTE_PATH": "/path/to/remote/folder/"
 }

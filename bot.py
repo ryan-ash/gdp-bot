@@ -9,7 +9,7 @@ import pytz
 from handlers.command_handlers import register_command_handlers
 from handlers.callback_handlers import register_callback_handlers
 from utils.scheduler import schedule_trigger
-
+from database import create_connection, create_subscriptions_table, create_posts_table, SUBSCRIPTIONS_DB, POSTS_DB
 
 bot = Bot(token=TOKEN)
 storage = MemoryStorage()
@@ -20,6 +20,12 @@ register_command_handlers(dp)
 register_callback_handlers(dp)
 
 async def on_startup(dp):
+    subs_conn = create_connection(SUBSCRIPTIONS_DB)
+    create_subscriptions_table(subs_conn)
+
+    posts_conn = create_connection(POSTS_DB)
+    create_posts_table(posts_conn)
+
     if ADMIN_CHAT_ID:
         await bot.send_message(chat_id=ADMIN_CHAT_ID, text='Bot has been started')
 
