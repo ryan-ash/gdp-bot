@@ -9,6 +9,7 @@ from states import BotStates
 from typing import Optional
 from utils.menu import show_menu
 from utils.scheduler import fetch_and_send_post
+import time
 
 
 async def get_subscription_info(chat_id):
@@ -58,8 +59,19 @@ async def gdp_unsub(message: Message, state: Optional[FSMContext] = None):
 
 
 async def gdp_schedule(message: Message, state: Optional[FSMContext] = None):
+    offset = time.timezone if (time.localtime().tm_isdst == 0) else time.altzone
+    offset_hours = int(offset / -3600)
+    server_timezone = f"UTC{offset_hours:+d}"
+    additional_prompt = ""
+
+    additional_prompt = "\n\nType /cancel to exit."
+    if message.chat.type != "private":
+        additional_prompt += "\nReply to this message to update the value."
+
     await message.reply(
-        "Please enter the scheduling rules in cron format. For help, use this link: [Crontab Guru](https://crontab.guru/)\n\nType /cancel to exit.",
+        f"Please enter the scheduling rules in cron format. For help, use this link: [Crontab Guru](https://crontab.guru/)\n\n"
+        f"Server timezone: {server_timezone}"
+        f"{additional_prompt}",
         parse_mode=ParseMode.MARKDOWN,
     )
     await BotStates.waiting_for_schedule.set()
@@ -71,7 +83,11 @@ async def gdp_filter(message: Message, state: Optional[FSMContext] = None):
     subscription = get_subscription(conn, chat_id)
     current_filter = subscription['filter'] if subscription and subscription['filter'] else '-'
 
-    prompt = f"Enter the filter using | to separate multiple filters, or * for no filter. Type /cancel to exit.\n\nRecommended: <code>{RECOMMENDED_FILTERS}</code>\nCurrent: <code>{current_filter}</code>"
+    additional_prompt = "\n\nType /cancel to exit."
+    if message.chat.type != "private":
+        additional_prompt += "\nReply to this message to update the value."
+
+    prompt = f"Enter the filter using | to separate multiple filters, or * for no filter.\n\nRecommended: <code>{RECOMMENDED_FILTERS}</code>\nCurrent: <code>{current_filter}</code>{additional_prompt}"
 
     await message.reply(prompt, parse_mode='HTML')
     await BotStates.waiting_for_filter.set()
