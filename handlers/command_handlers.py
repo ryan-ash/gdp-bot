@@ -1,7 +1,7 @@
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ParseMode, Message
-from config import CHANNEL_USERNAME, RECOMMENDED_FILTERS
+from config import CHANNEL_USERNAME, RECOMMENDED_FILTERS, ABOUT_COVER_URL, ABOUT_COVER_AMOUNT
 from croniter import croniter
 from cron_descriptor import ExpressionDescriptor
 from database import *
@@ -9,7 +9,16 @@ from states import BotStates
 from typing import Optional
 from utils.menu import show_menu
 from utils.scheduler import fetch_and_send_post
+import random
 import time
+
+
+def get_random_about_cover_url():
+    if ABOUT_COVER_AMOUNT == 1:
+        return ABOUT_COVER_URL
+    else:
+        random_number = random.randint(1, ABOUT_COVER_AMOUNT)
+        return ABOUT_COVER_URL.replace('{index}', str(random_number))
 
 
 async def get_subscription_info(chat_id):
@@ -97,8 +106,12 @@ async def show_about(message: Message):
     chat_id = message.chat.id
     subscription_info = await get_subscription_info(chat_id)
 
+    about_cover_url = get_random_about_cover_url()
+    invisible_link = f'<a href="{about_cover_url}">&nbsp;</a>'
+
     about_text = (
-        f"Hey there! This rad bot hooks you up with updates from the {CHANNEL_USERNAME} channel, tailored just for you! "
+        invisible_link +
+        f"Hey there! This rad bot hooks you up with updates from the {CHANNEL_USERNAME} channel, tailored just for you!"
         "Subscribe and customize your schedule and filters, so you'll only get the coolest, most wicked posts that suit your taste. Rock on!"
     )
     

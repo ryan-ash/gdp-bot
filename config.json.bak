@@ -13,5 +13,7 @@
     "SFTP_PORT": 22,
     "SFTP_USER": "your_username",
     "SFTP_PASSWORD": "your_password",
-    "SFTP_REMOTE_PATH": "/path/to/remote/folder/"
+    "SFTP_REMOTE_PATH": "/path/to/remote/folder/",
+    "ABOUT_COVER_URL": "https://url.to/image-{index}.png",
+    "ABOUT_COVER_AMOUNT": 10
 }
