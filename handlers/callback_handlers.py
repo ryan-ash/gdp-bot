@@ -1,13 +1,18 @@
 from aiogram import types
 from aiogram.dispatcher import Dispatcher, FSMContext
 
-from handlers.command_handlers import gdp_sub, gdp_unsub, gdp_filter, gdp_schedule, show_about, send_filtered_post
+from handlers.command_handlers import gdp_sub, gdp_unsub, gdp_filter, gdp_schedule, show_about, send_filtered_post, is_valid_sender_and_reply
 from utils.menu import show_menu
 
 
 async def handle_callback(callback_query: types.CallbackQuery, state: FSMContext):
     option = callback_query.data
     chat_id = callback_query.message.chat.id
+
+    restricted_options = ['sub', 'unsub', 'set_filter', 'set_schedule']
+    if option in restricted_options:
+        if not await is_valid_sender_and_reply(callback_query):
+            return
 
     if option == 'sub':
         response = await gdp_sub(callback_query.message)
