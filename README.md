@@ -1,5 +1,6 @@
 # GDP Telegram Bot
 
+![cover](https://github.com/ryan-ash/gdp-bot/raw/develop/img/about/gdp_about%20(3).png)
 [Demo](https://t.me/GameDevPornBot) | [Creation Log](https://drive.google.com/file/d/1G34F4wTs2C2XSudk7t8WWfTqbrLythuA/view?usp=sharing)
 
 The GDP Telegram Bot is a useful utility designed to provide users with updates from a specified Telegram channel. The bot allows users to subscribe and customize their preferences, ensuring they only receive content that matches their interests.
