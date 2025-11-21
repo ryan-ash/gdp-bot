@@ -40,7 +40,14 @@ async def on_shutdown(dp):
 
 if __name__ == '__main__':
     from aiogram import executor
+    import asyncio
+    from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
     scheduler = AsyncIOScheduler(timezone=pytz.UTC)
     scheduler.add_job(schedule_trigger, 'interval', minutes=1, args=(bot,))
-    scheduler.start()
-    executor.start_polling(dp, on_startup=on_startup, on_shutdown=on_shutdown)
+
+    async def main():
+        scheduler.start()
+        await executor.start_polling(dp, on_startup=on_startup, on_shutdown=on_shutdown)
+
+    asyncio.run(main())
