@@ -2,7 +2,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.dispatcher import FSMContext
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 from config import TOKEN, ADMIN_CHAT_ID
 import pytz
 
@@ -40,14 +40,9 @@ async def on_shutdown(dp):
 
 if __name__ == '__main__':
     from aiogram import executor
-    import asyncio
-    from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-    scheduler = AsyncIOScheduler(timezone=pytz.UTC)
+    scheduler = BackgroundScheduler(timezone=pytz.UTC)
     scheduler.add_job(schedule_trigger, 'interval', minutes=1, args=(bot,))
+    scheduler.start()
 
-    async def main():
-        scheduler.start()
-        await executor.start_polling(dp, on_startup=on_startup, on_shutdown=on_shutdown)
-
-    asyncio.run(main())
+    executor.start_polling(dp, on_startup=on_startup, on_shutdown=on_shutdown)
